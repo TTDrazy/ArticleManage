@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>修改文章</title>
+    <meta charset="utf-8" />
+    <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="../JS/tools.js"></script>
+    <script src="../JS/base.js"></script>
+    <script src="../JS/article.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <style>
+        body{
+            background-color: #f7d1e6;
+        }
+        label{
+            color: #2e6da4;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航条 -->
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+                    aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">文章管理系统</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="./default.html">所有文章<span class="sr-only">(current)</span></a></li>
+                    <li class="active"><a href="./personal.html">我的文章</a></li>
+
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">我的账户</a></li>
+                    <li><a href="#" onclick="removeUser()">注销</a></li>
+                </ul>
+                <form class="navbar-form navbar-right">
+                    <div class="form-group">
+                        <input type="text" id="search_text" class="form-control" placeholder="Search">
+                    </div>
+                    <button type="button" id="search" class="btn btn-default">搜索</button>
+                </form>
+
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+    <!-- 增添输入框组 -->
+    <div class="container">
+        <h2 class="text-center creatTitle">修改文章</h2>
+        <form>
+            <div class="form-group">
+                <label>文章标题</label>
+                <input type="text" id="title" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>文章内容</label>
+                <textarea rows="12" id="content" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                <label>创建时间</label>
+                <input type="date" id="date" class="form-control">
+            </div>
+
+            <div class="row">
+                <button type="button" id="amend" class="btn btn-primary btn-lg col-md-2 col-md-offset-5">修改</button>
+            </div>
+        </form>
+
+    </div>
+
+    <script>
+        var userid = Cookies.get('userid');
+        var articleId = GetQueryString("articleid");
+        //获取原本数据
+        var getArticleDetailById = function (articleId) {
+            if (checkEmpty(userid)) {
+                $.get(requestUrl + "/article/" + articleId).then(function (article) {
+                    $("#title").val(article.articleName);
+                    $("#content").val(article.content);
+                    $("#date").val(getLocalTime(article.date));
+                })
+            } else {
+                alert("您没有修改权限！");
+                window.location = "../user/login.html";
+            }
+        }
+        //修改内容
+        var article = {};
+        var amendArticle = function () {
+            article.articleName = $("#title").val();
+            article.content = $("#content").val();
+            article.date = timeToTimestamp($("#date").val());
+            $.ajax({
+                url: requestUrl + "/article/" + articleId,
+                method: "put",
+                data: article,
+                success: function (data) {
+                    alert("您已修改成功！");
+                    window.location = "./personal.html";
+                }
+            })
+        }
+
+        $(document).ready(function () {
+            getArticleDetailById(articleId);
+            $("#amend").click(function () {
+                amendArticle();
+            })
+        });
+    </script>
+</body>
+
+</html>

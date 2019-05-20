@@ -1,0 +1,134 @@
+﻿<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>我的文章</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="../JS/tools.js"></script>
+    <script src="../JS/base.js"></script>
+    <script src="../JS/article.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <style>
+        .table>tbody>tr>td{
+        height: 30px;
+        line-height: 30px;
+    }
+        tr,th,td{
+        text-align: center;
+    }
+    </style>
+</head>
+
+<body>
+    <!-- 导航条 -->
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+                    aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">文章管理系统</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="./default.html">所有文章<span class="sr-only">(current)</span></a></li>
+                    <li class="active"><a href="./personal.html">我的文章</a></li>
+
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">我的账户</a></li>
+                    <li><a href="#" onclick="removeUser()">注销</a></li>
+                </ul>
+                <form class="navbar-form navbar-right">
+                    <div class="form-group">
+                        <input type="text" id="search_text" class="form-control" placeholder="Search">
+                    </div>
+                    <button type="button" id="search" class="btn btn-default">搜索</button>
+                </form>
+
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+    <!-- 文章列表 -->
+    <div class="container">
+        <table class="table table-hover">
+            <tr class="info">
+                <th>文章名</th>
+                <th>时间</th>
+                <th>查看详情</th>
+                <th colspan=2>操作功能</th>
+            </tr>
+            <tbody id="article_table"></tbody>
+
+        </table>
+        <hr />
+        <div class="row">
+            <a class="btn btn-primary btn-lg col-md-2 col-md-offset-9" href="./creat.html">新建文章</a>
+        </div>
+
+    </div>
+    <script>
+        var getAllArticleById = function (userid) {
+            if (checkEmpty(userid)) {
+                $.get(requestUrl + "/article").then(function (data) {
+                    var personalArticles = data.filter(article => article.userid ==
+                        userid);
+                    var html = "";
+                    personalArticles.forEach(function (article) {
+                        html +=
+                            `
+                                <tr class ="warning">
+                                <td>${article.articleName}</td>
+                                <td>${timestampToTime(article.date)}</td>
+                                <td><a href="./detail.html?id=${article.id}" class ="btn btn-primary">查看详情</button></td>
+                                <td><a href="./amend.html?articleid=${article.id}" class ="btn btn-warning">修改</button></td>
+                                <td><button class ="btn btn-danger" onclick="deleteArticleById(${article.id})">删除</button></td>
+                                </tr>
+
+                                `
+                    });
+                    $("#article_table").html(html);
+                })
+            } else {
+                window.location = "../user/login.html";
+            }
+        }
+
+        var deleteArticleById = function (id) {
+            if (checkEmpty(id)) {
+                if (confirm("是否删除该文章？")) {
+                    $.ajax({
+                        url: requestUrl + "/article/" + id,
+                        method: "delete",
+                        success: function (article) {
+                            alert("删除成功！");
+                            //重新加载该用户下的所有文章
+                            getAllArticleById(id);
+                        }
+                    })
+                }
+            }
+        }
+
+        $(document).ready(function () {
+            $.get(requestUrl + "/user").then(function (data) {
+                var userid = Cookies.get('userid');
+                //默认获取该用户id下所有文章
+                getAllArticleById(userid);
+
+            });
+        })
+    </script>
+</body>
+
+</html>

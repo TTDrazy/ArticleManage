@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-size: 35px;
+            margin-top: 300px;
+        }
+
+        .ft-color {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <p class="bg-success text-center">登陆成功<span class="glyphicon glyphicon-ok ft-color"></span></p>
+    </div>
+    <script>
+        $(document).ready(function () {
+            alert("将在3秒后为您跳转您的私人账户！");
+            setTimeout(function () {
+                window.location ="../../article/personal.html";
+            }, 3000)
+        });
+    </script>
+</body>
+
+</html>
